@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>週間献立メモ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #FFF5E6;
+            color: #5D4037;
+        }
+        h1, h2 {
+            color: #8D6E63;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #FFFFFF;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #D7CCC8;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #EFEBE9;
+        }
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #D7CCC8;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #8D6E63;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #6D4C41;
+        }
+        @media (max-width: 768px) {
+            table, tr, td {
+                display: block;
+            }
+            th {
+                display: none;
+            }
+            tr {
+                margin-bottom: 15px;
+                border: 1px solid #D7CCC8;
+            }
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+            }
+            td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>週間献立メモ</h1>
+    <table id="mealTable">
+        <tr>
+            <th>曜日</th>
+            <th>献立</th>
+            <th>長男</th>
+        </tr>
+        <tr>
+            <td data-label="曜日">月曜日</td>
+            <td data-label="献立"><input type="text" id="monday" /></td>
+            <td data-label="長男">
+                <select id="mondaySon">
+                    <option value="家">家</option>
+                    <option value="外出">外出</option>
+                    <option value="バイト">バイト</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td data-label="曜日">火曜日</td>
+            <td data-label="献立"><input type="text" id="tuesday" /></td>
+            <td data-label="長男">
+                <select id="tuesdaySon">
+                    <option value="家">家</option>
+                    <option value="外出">外出</option>
+                    <option value="バイト">バイト</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td data-label="曜日">水曜日</td>
+            <td data-label="献立"><input type="text" id="wednesday" /></td>
+            <td data-label="長男">
+                <select id="wednesdaySon">
+                    <option value="家">家</option>
+                    <option value="外出">外出</option>
+                    <option value="バイト">バイト</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td data-label="曜日">木曜日</td>
+            <td data-label="献立"><input type="text" id="thursday" /></td>
+            <td data-label="長男">
+                <select id="thursdaySon">
+                    <option value="家">家</option>
+                    <option value="外出">外出</option>
+                    <option value="バイト">バイト</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td data-label="曜日">金曜日</td>
+            <td data-label="献立"><input type="text" id="friday" /></td>
+            <td data-label="長男">
+                <select id="fridaySon">
+                    <option value="家">家</option>
+                    <option value="外出">外出</option>
+                    <option value="バイト">バイト</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td data-label="曜日">土曜日</td>
+            <td data-label="献立"><input type="text" id="saturday" /></td>
+            <td data-label="長男">
+                <select id="saturdaySon">
+                    <option value="家">家</option>
+                    <option value="外出">外出</option>
+                    <option value="バイト">バイト</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td data-label="曜日">日曜日</td>
+            <td data-label="献立"><input type="text" id="sunday" /></td>
+            <td data-label="長男">
+                <select id="sundaySon">
+                    <option value="家">家</option>
+                    <option value="外出">外出</option>
+                    <option value="バイト">バイト</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+
+    <h2>メモ</h2>
+    <textarea id="notes"></textarea>
+
+    <button onclick="saveMealPlan()">保存</button>
+
+    <script>
+        function saveMealPlan() {
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const mealPlan = {};
+
+            days.forEach(day => {
+                const input = document.getElementById(day);
+                const sonSelect = document.getElementById(day + 'Son');
+                mealPlan[day] = {
+                    meal: DOMPurify.sanitize(input.value),
+                    son: DOMPurify.sanitize(sonSelect.value)
+                };
+            });
+
+            const notes = DOMPurify.sanitize(document.getElementById('notes').value);
+            mealPlan.notes = notes;
+
+            localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+            alert('プランが保存されました！');
+        }
+
+        function loadMealPlan() {
+            const savedMealPlan = localStorage.getItem('mealPlan');
+            if (savedMealPlan) {
+                const mealPlan = JSON.parse(savedMealPlan);
+                const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+                days.forEach(day => {
+                    const input = document.getElementById(day);
+                    const sonSelect = document.getElementById(day + 'Son');
+                    if (mealPlan[day]) {
+                        input.value = mealPlan[day].meal || '';
+                        sonSelect.value = mealPlan[day].son || '家';
+                    }
+                });
+
+                document.getElementById('notes').value = mealPlan.notes || '';
+            }
+        }
+
+        window.onload = loadMealPlan;
+    </script>
+</body>
+</html>
